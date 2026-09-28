@@ -754,6 +754,7 @@ function render(){
   } else {
     $("#retry").onclick = () => { r.status = "new"; r.tries = 0; save(); render(); };
   }
+  renderProgress();
 }
 
 function resultMsg(r, p){
