@@ -18,7 +18,10 @@ no mistake-specific hints. Do not add them back.
    the answer was derived; nothing displays them.
 - Progress is stored in localStorage under `percent-decrease-progress-v1`:
   `{ [id]: { status: "new"|"correct1"|"correct2"|"missed", tries, attempts, last } }`
-- Views: Practice (grid + problem card) and Progress (stats, by-level, per-problem table).
+- Views: Practice and Progress (stats, by-level, per-problem table).
+  Practice leads with the problem card and Previous / Next. The 1–37 number grid, the filter and
+  the colour legend live inside the collapsed `<details id="picker">` below it, so the student sees
+  one problem at a time instead of a wall of buttons. Keep them there.
 
 ## Rules
 - UI text and problems are in English (the student's class is in English). README is Japanese for the parent.
