@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Percent Decrease Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1D2B4F; --ink-soft:#4A5878; --paper:#F7F9FC; --card:#FFFFFF; --sky:#DCEAF7;
+  --line:#C9D4E3; --mint:#1F9D72; --gold:#D8960C; --rose:#CC3F5A; --mark:#FFE58A;
+  --font:"Lexend", "Segoe UI", "Hiragino Sans", system-ui, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--ink:#E6ECF7;--ink-soft:#A7B3CB;--paper:#121A2C;--card:#1B2640;--sky:#24365A;--line:#34476E;--mark:#6B5A10}
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding:20px 18px 64px}
+header h1{font-size:1.6rem;line-height:1.2;margin:8px 0 4px;font-weight:700;letter-spacing:-.01em}
+header p{margin:0;color:var(--ink-soft);font-size:.95rem}
+.formula{margin:16px 0 0;padding:12px 14px;border-left:4px solid var(--ink);background:var(--sky);border-radius:0 8px 8px 0;font-size:.95rem}
+.formula b{background:var(--mark);padding:0 3px;border-radius:3px}
+nav.tabs{display:flex;gap:6px;margin:22px 0 14px}
+nav.tabs button{flex:1}
+button{font:inherit;cursor:pointer;border-radius:10px;border:2px solid var(--ink);background:transparent;color:var(--ink);padding:10px 14px;font-weight:600}
+button.primary{background:var(--ink);color:var(--paper)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+button:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:5px;margin:4px 0 6px}
+.grid button{padding:0;height:34px;border-radius:7px;font-size:.8rem;border:2px solid var(--line);font-weight:600}
+.grid button.s-correct1{background:var(--mint);border-color:var(--mint);color:#fff}
+.grid button.s-correct2{background:var(--gold);border-color:var(--gold);color:#fff}
+.grid button.s-missed{background:var(--rose);border-color:var(--rose);color:#fff}
+.grid button.current{outline:3px solid var(--ink);outline-offset:1px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--ink-soft);margin-bottom:14px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:2px solid var(--line)}
+.filters{display:flex;gap:8px;align-items:center;margin-bottom:14px;font-size:.9rem}
+select{font:inherit;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+.card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:20px}
+.meta{display:flex;justify-content:space-between;font-size:.85rem;color:var(--ink-soft);margin-bottom:10px}
+.q{font-size:1.08rem;margin:0 0 18px}
+.drop{margin:0 0 20px}
+.bar-row{display:grid;grid-template-columns:58px 1fr;align-items:center;gap:10px;margin:6px 0;font-size:.82rem;color:var(--ink-soft)}
+.track{position:relative;height:26px}
+.bar{height:100%;border-radius:6px;background:var(--ink);transform-origin:left;display:flex;align-items:center;padding-left:8px;color:var(--paper);font-size:.8rem;white-space:nowrap;overflow:hidden}
+.gap{position:absolute;top:0;height:100%;border:2px dashed var(--rose);border-left:none;border-radius:0 6px 6px 0;background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--rose) 22%,transparent) 6px 9px)}
+.bar-out{position:absolute;top:0;height:100%;display:flex;align-items:center;padding-left:8px;font-size:.8rem;color:var(--ink);white-space:nowrap;z-index:1}
+@media (prefers-reduced-motion:no-preference){.bar.grow{animation:grow .6s ease-out}@keyframes grow{from{transform:scaleX(0)}}}
+.answer{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.answer input{font:inherit;font-size:1.15rem;width:150px;padding:9px 12px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--ink)}
+.tries{font-size:.85rem;color:var(--ink-soft)}
+.feedback{margin-top:14px;padding:12px 14px;border-radius:10px;font-weight:500}
+.feedback.ok{background:color-mix(in srgb,var(--mint) 15%,transparent);border-left:4px solid var(--mint)}
+.feedback.bad{background:color-mix(in srgb,var(--rose) 13%,transparent);border-left:4px solid var(--rose)}
+.feedback.info{background:var(--sky);border-left:4px solid var(--ink)}
+.solution{margin-top:16px;border-top:2px solid var(--line);padding-top:14px}
+.solution h3{margin:0 0 8px;font-size:1rem}
+.solution ol{margin:0;padding-left:1.3em}
+.solution li{margin:5px 0}
+.solution mark{background:var(--mark);color:inherit;padding:0 3px;border-radius:3px}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+.stat{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat strong{display:block;font-size:1.6rem;line-height:1.2}
+.stat span{font-size:.85rem;color:var(--ink-soft)}
+.meter{height:10px;background:var(--sky);border-radius:99px;overflow:hidden;margin:6px 0 2px}
+.meter div{height:100%;background:var(--mint)}
+.table-wrap{overflow-x:auto;background:var(--card);border:2px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--ink-soft);font-weight:500}
+td a{color:var(--ink);font-weight:600}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:.78rem;font-weight:600;color:#fff}
+.hidden{display:none!important}
+.danger{border-color:var(--rose);color:var(--rose);margin-top:18px}
+h2{font-size:1.15rem;margin:22px 0 10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Percent Decrease Practice</h1>
+  <p id="headline">37 problems. Round every answer to the nearest tenth of a percent.</p>
+  <div class="formula">Percent decrease = (original − new) ÷ <b>original</b> × 100</div>
+</header>
+
+<nav class="tabs">
+  <button id="tabPractice" aria-pressed="true">Practice</button>
+  <button id="tabProgress" aria-pressed="false">Progress</button>
+</nav>
+
+<section id="viewPractice">
+  <div class="filters">
+    <label for="filter">Show</label>
+    <select id="filter">
+      <option value="all">All 37 problems</option>
+      <option value="Original">Homework problems (1–7)</option>
+      <option value="Practice">Extra practice (8–37)</option>
+      <option value="review">Missed or needed 2 tries</option>
+      <option value="todo">Not answered yet</option>
+    </select>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="legend">
+    <span><i></i>Not answered</span>
+    <span><i style="background:var(--mint);border-color:var(--mint)"></i>Correct on 1st try</span>
+    <span><i style="background:var(--gold);border-color:var(--gold)"></i>Correct on 2nd try</span>
+    <span><i style="background:var(--rose);border-color:var(--rose)"></i>Missed</span>
+  </div>
+
+  <article class="card" id="card"></article>
+  <div class="nav">
+    <button id="prev">Previous</button>
+    <button id="next" class="primary">Next problem</button>
+  </div>
+</section>
+
+<section id="viewProgress" class="hidden">
+  <div class="stats" id="stats"></div>
+  <h2>By level</h2>
+  <div class="stats" id="levels"></div>
+  <h2>Every problem</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Level</th><th>Result</th><th>Attempts</th><th>Last practiced</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+  <button class="danger" id="reset">Reset all progress</button>
+</section>
+</div>
+
+<script>
+const PROBLEMS = [
+ {
+  "id": 1,
+  "set": "Original",
+  "level": "Standard",
+  "text": "In a certain year, the population of a city was 45,800 people. Ten years later, the population was 42,200 people. What is the percent decrease in the population?",
+  "orig": "45800",
+  "new": "42200",
+  "prefix": "",
+  "unit": "people",
+  "diff": "3600",
+  "ratio": "0.07860…",
+  "pct": "7.860…",
+  "answer": "7.9"
+ },
+ {
+  "id": 2,
+  "set": "Original",
+  "level": "Standard",
+  "text": "After 20 years, the enrollment at a college dropped from 4,800 students to 3,900 students. What is the percent decrease in the enrollment at the college?",
+  "orig": "4800",
+  "new": "3900",
+  "prefix": "",
+  "unit": "students",
+  "diff": "900",
+  "ratio": "0.1875",
+  "pct": "18.75",
+  "answer": "18.8"
+ },
+ {
+  "id": 3,
+  "set": "Original",
+  "level": "Standard",
+  "text": "Rebekah bought a computer for $900. After 5 years the value of her computer was $120. What is the percent decrease in the value of Rebekah's computer?",
+  "orig": "900",
+  "new": "120",
+  "prefix": "$",
+  "unit": "",
+  "diff": "780",
+  "ratio": "0.86667…",
+  "pct": "86.667…",
+  "answer": "86.7"
+ },
+ {
+  "id": 4,
+  "set": "Original",
+  "level": "Challenge",
+  "text": "The number of people that subscribed to cable TV in 2000 was 68,500,000. In 2015, the number of people that subscribed was 53,200,000. What is the percent decrease in the number of cable TV subscribers from 2000 to 2015?",
+  "orig": "68500000",
+  "new": "53200000",
+  "prefix": "",
+  "unit": "subscribers",
+  "diff": "15300000",
+  "ratio": "0.22336…",
+  "pct": "22.336…",
+  "answer": "22.3"
+ },
+ {
+  "id": 5,
+  "set": "Original",
+  "level": "Basic",
+  "text": "During a weather report, a meteorologist displayed a graphic showing the snowfall totals: 68 total inches last year and 51 total inches this year. What was the percent decrease in snowfall from last year to this year?",
+  "orig": "68",
+  "new": "51",
+  "prefix": "",
+  "unit": "inches",
+  "diff": "17",
+  "ratio": "0.25",
+  "pct": "25",
+  "answer": "25.0"
+ },
+ {
+  "id": 6,
+  "set": "Original",
+  "level": "Basic",
+  "text": "The value of a stock at the beginning of the month was $45. By the end of the month, the value of the stock was $42. What was the percent decrease in the value of the stock?",
+  "orig": "45",
+  "new": "42",
+  "prefix": "$",
+  "unit": "",
+  "diff": "3",
+  "ratio": "0.06667…",
+  "pct": "6.667…",
+  "answer": "6.7"
+ },
+ {
+  "id": 7,
+  "set": "Original",
+  "level": "Challenge",
+  "text": "A zoologist weighs a white rhinoceros at a zoo and discovers that it weighs 5,500 pounds. The healthy weight for this type of rhinoceros is 4,900 pounds. A year after the zoologist alters the rhinoceros's diet, it is at its healthy weight. What is the percent decrease in the rhinoceros's weight?",
+  "orig": "5500",
+  "new": "4900",
+  "prefix": "",
+  "unit": "pounds",
+  "diff": "600",
+  "ratio": "0.10909…",
+  "pct": "10.909…",
+  "answer": "10.9"
+ },
+ {
+  "id": 8,
+  "set": "Practice",
+  "level": "Challenge",
+  "text": "A jacket is on sale for $62. Before the sale, it cost $80. What is the percent decrease in the price of the jacket?",
+  "orig": "80",
+  "new": "62",
+  "prefix": "$",
+  "unit": "",
+  "diff": "18",
+  "ratio": "0.225",
+  "pct": "22.5",
+  "answer": "22.5"
+ },
+ {
+  "id": 9,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "A town had 12,400 residents in 2010. By 2020, it had 11,350 residents. What is the percent decrease in the town's population?",
+  "orig": "12400",
+  "new": "11350",
+  "prefix": "",
+  "unit": "residents",
+  "diff": "1050",
+  "ratio": "0.08468…",
+  "pct": "8.468…",
+  "answer": "8.5"
+ },
+ {
+  "id": 10,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "Marcus bought a car for $24,000. After 4 years, the car was worth $15,600. What is the percent decrease in the value of the car?",
+  "orig": "24000",
+  "new": "15600",
+  "prefix": "$",
+  "unit": "",
+  "diff": "8400",
+  "ratio": "0.35",
+  "pct": "35",
+  "answer": "35.0"
+ },
+ {
+  "id": 11,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "A school library had 8,250 books. After removing old books, it had 7,590 books. What is the percent decrease in the number of books?",
+  "orig": "8250",
+  "new": "7590",
+  "prefix": "",
+  "unit": "books",
+  "diff": "660",
+  "ratio": "0.08",
+  "pct": "8",
+  "answer": "8.0"
+ },
+ {
+  "id": 12,
+  "set": "Practice",
+  "level": "Challenge",
+  "text": "Last season, Aiko ran a mile in 560 seconds. This season, she runs a mile in 518 seconds. What is the percent decrease in her mile time?",
+  "orig": "560",
+  "new": "518",
+  "prefix": "",
+  "unit": "seconds",
+  "diff": "42",
+  "ratio": "0.075",
+  "pct": "7.5",
+  "answer": "7.5"
+ },
+ {
+  "id": 13,
+  "set": "Practice",
+  "level": "Basic",
+  "text": "A family's electric bill was $135 in July and $108 in October. What is the percent decrease in the electric bill?",
+  "orig": "135",
+  "new": "108",
+  "prefix": "$",
+  "unit": "",
+  "diff": "27",
+  "ratio": "0.2",
+  "pct": "20",
+  "answer": "20.0"
+ },
+ {
+  "id": 14,
+  "set": "Practice",
+  "level": "Basic",
+  "text": "The water in a lake was 42 feet deep in spring. By the end of summer, it was 37 feet deep. What is the percent decrease in the depth of the lake?",
+  "orig": "42",
+  "new": "37",
+  "prefix": "",
+  "unit": "feet",
+  "diff": "5",
+  "ratio": "0.11905…",
+  "pct": "11.905…",
+  "answer": "11.9"
+ },
+ {
+  "id": 15,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "On Monday, 1,260 students attended a school. On Friday, 1,175 students attended. What is the percent decrease in attendance from Monday to Friday?",
+  "orig": "1260",
+  "new": "1175",
+  "prefix": "",
+  "unit": "students",
+  "diff": "85",
+  "ratio": "0.06746…",
+  "pct": "6.746…",
+  "answer": "6.7"
+ },
+ {
+  "id": 16,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "A farmer harvested 3,600 pounds of apples last year. This year, the farmer harvested 2,950 pounds. What is the percent decrease in the apple harvest?",
+  "orig": "3600",
+  "new": "2950",
+  "prefix": "",
+  "unit": "pounds",
+  "diff": "650",
+  "ratio": "0.18056…",
+  "pct": "18.056…",
+  "answer": "18.1"
+ },
+ {
+  "id": 17,
+  "set": "Practice",
+  "level": "Basic",
+  "text": "A video game cost $59 when it came out. A year later, the price was $39. What is the percent decrease in the price of the game?",
+  "orig": "59",
+  "new": "39",
+  "prefix": "$",
+  "unit": "",
+  "diff": "20",
+  "ratio": "0.33898…",
+  "pct": "33.898…",
+  "answer": "33.9"
+ },
+ {
+  "id": 18,
+  "set": "Practice",
+  "level": "Basic",
+  "text": "The value of a stock was $128 on Monday. On Friday, the value was $115. What was the percent decrease in the value of the stock?",
+  "orig": "128",
+  "new": "115",
+  "prefix": "$",
+  "unit": "",
+  "diff": "13",
+  "ratio": "0.10156…",
+  "pct": "10.156…",
+  "answer": "10.2"
+ },
+ {
+  "id": 19,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "The Tanaka family spent $620 on groceries in March. In April, they spent $545. What is the percent decrease in their grocery spending?",
+  "orig": "620",
+  "new": "545",
+  "prefix": "$",
+  "unit": "",
+  "diff": "75",
+  "ratio": "0.12097…",
+  "pct": "12.097…",
+  "answer": "12.1"
+ },
+ {
+  "id": 20,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "A movie theater sold 2,840 tickets in June. In September, it sold 2,130 tickets. What is the percent decrease in ticket sales?",
+  "orig": "2840",
+  "new": "2130",
+  "prefix": "",
+  "unit": "tickets",
+  "diff": "710",
+  "ratio": "0.25",
+  "pct": "25",
+  "answer": "25.0"
+ },
+ {
+  "id": 21,
+  "set": "Practice",
+  "level": "Challenge",
+  "text": "A veterinarian says a dog's healthy weight is 74 pounds. The dog currently weighs 86 pounds. After six months on a new diet, the dog reaches its healthy weight. What is the percent decrease in the dog's weight?",
+  "orig": "86",
+  "new": "74",
+  "prefix": "",
+  "unit": "pounds",
+  "diff": "12",
+  "ratio": "0.13953…",
+  "pct": "13.953…",
+  "answer": "14.0"
+ },
+ {
+  "id": 22,
+  "set": "Practice",
+  "level": "Basic",
+  "text": "A city received 38 inches of rain last year and 29 inches of rain this year. What is the percent decrease in rainfall?",
+  "orig": "38",
+  "new": "29",
+  "prefix": "",
+  "unit": "inches",
+  "diff": "9",
+  "ratio": "0.23684…",
+  "pct": "23.684…",
+  "answer": "23.7"
+ },
+ {
+  "id": 23,
+  "set": "Practice",
+  "level": "Challenge",
+  "text": "A newspaper had 1,450,000 subscribers in 2005. In 2020, it had 980,000 subscribers. What is the percent decrease in the number of subscribers?",
+  "orig": "1450000",
+  "new": "980000",
+  "prefix": "",
+  "unit": "subscribers",
+  "diff": "470000",
+  "ratio": "0.32414…",
+  "pct": "32.414…",
+  "answer": "32.4"
+ },
+ {
+  "id": 24,
+  "set": "Practice",
+  "level": "Basic",
+  "text": "Kenji bought a bike for $450. Three years later, he sold it for $270. What is the percent decrease in the value of the bike?",
+  "orig": "450",
+  "new": "270",
+  "prefix": "$",
+  "unit": "",
+  "diff": "180",
+  "ratio": "0.4",
+  "pct": "40",
+  "answer": "40.0"
+ },
+ {
+  "id": 25,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "A factory produced 5,200 units in January and 4,680 units in February. What is the percent decrease in production?",
+  "orig": "5200",
+  "new": "4680",
+  "prefix": "",
+  "unit": "units",
+  "diff": "520",
+  "ratio": "0.1",
+  "pct": "10",
+  "answer": "10.0"
+ },
+ {
+  "id": 26,
+  "set": "Practice",
+  "level": "Challenge",
+  "text": "The price of gas was $3.85 per gallon last month. This month, the price is $3.49 per gallon. What is the percent decrease in the price of gas?",
+  "orig": "3.85",
+  "new": "3.49",
+  "prefix": "$",
+  "unit": "",
+  "diff": "0.36",
+  "ratio": "0.09351…",
+  "pct": "9.351…",
+  "answer": "9.4"
+ },
+ {
+  "id": 27,
+  "set": "Practice",
+  "level": "Basic",
+  "text": "A chess club had 64 members at the start of the year. At the end of the year, it had 48 members. What is the percent decrease in membership?",
+  "orig": "64",
+  "new": "48",
+  "prefix": "",
+  "unit": "members",
+  "diff": "16",
+  "ratio": "0.25",
+  "pct": "25",
+  "answer": "25.0"
+ },
+ {
+  "id": 28,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "A new smartphone cost $1,099. One year later, the same phone cost $849. What is the percent decrease in the price of the phone?",
+  "orig": "1099",
+  "new": "849",
+  "prefix": "$",
+  "unit": "",
+  "diff": "250",
+  "ratio": "0.22748…",
+  "pct": "22.748…",
+  "answer": "22.7"
+ },
+ {
+  "id": 29,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "A forest had 15,000 trees. After a wildfire, it had 13,200 trees. What is the percent decrease in the number of trees?",
+  "orig": "15000",
+  "new": "13200",
+  "prefix": "",
+  "unit": "trees",
+  "diff": "1800",
+  "ratio": "0.12",
+  "pct": "12",
+  "answer": "12.0"
+ },
+ {
+  "id": 30,
+  "set": "Practice",
+  "level": "Basic",
+  "text": "A water tank held 750 gallons of water. After a week without rain, it held 480 gallons. What is the percent decrease in the amount of water?",
+  "orig": "750",
+  "new": "480",
+  "prefix": "",
+  "unit": "gallons",
+  "diff": "270",
+  "ratio": "0.36",
+  "pct": "36",
+  "answer": "36.0"
+ },
+ {
+  "id": 31,
+  "set": "Practice",
+  "level": "Basic",
+  "text": "A bakery sold 340 loaves of bread last week and 289 loaves this week. What is the percent decrease in bread sales?",
+  "orig": "340",
+  "new": "289",
+  "prefix": "",
+  "unit": "loaves",
+  "diff": "51",
+  "ratio": "0.15",
+  "pct": "15",
+  "answer": "15.0"
+ },
+ {
+  "id": 32,
+  "set": "Practice",
+  "level": "Challenge",
+  "text": "When it was new, a laptop battery lasted 11 hours. Now it lasts 8.5 hours. What is the percent decrease in battery life?",
+  "orig": "11",
+  "new": "8.5",
+  "prefix": "",
+  "unit": "hours",
+  "diff": "2.5",
+  "ratio": "0.22727…",
+  "pct": "22.727…",
+  "answer": "22.7"
+ },
+ {
+  "id": 33,
+  "set": "Practice",
+  "level": "Challenge",
+  "text": "An airport served 2,450,000 passengers in one year. The next year, it served 1,960,000 passengers. What is the percent decrease in passengers?",
+  "orig": "2450000",
+  "new": "1960000",
+  "prefix": "",
+  "unit": "passengers",
+  "diff": "490000",
+  "ratio": "0.2",
+  "pct": "20",
+  "answer": "20.0"
+ },
+ {
+  "id": 34,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "On her first typing test, Mia made 48 errors. On her second test, she made 30 errors. What is the percent decrease in the number of errors?",
+  "orig": "48",
+  "new": "30",
+  "prefix": "",
+  "unit": "errors",
+  "diff": "18",
+  "ratio": "0.375",
+  "pct": "37.5",
+  "answer": "37.5"
+ },
+ {
+  "id": 35,
+  "set": "Practice",
+  "level": "Basic",
+  "text": "A beach was 125 feet wide. After a storm, it was 118 feet wide. What is the percent decrease in the width of the beach?",
+  "orig": "125",
+  "new": "118",
+  "prefix": "",
+  "unit": "feet",
+  "diff": "7",
+  "ratio": "0.056",
+  "pct": "5.6",
+  "answer": "5.6"
+ },
+ {
+  "id": 36,
+  "set": "Practice",
+  "level": "Challenge",
+  "text": "This year, a ski resort received 55 inches of snow. Last year, it received 72 inches. What was the percent decrease in snowfall from last year to this year?",
+  "orig": "72",
+  "new": "55",
+  "prefix": "",
+  "unit": "inches",
+  "diff": "17",
+  "ratio": "0.23611…",
+  "pct": "23.611…",
+  "answer": "23.6"
+ },
+ {
+  "id": 37,
+  "set": "Practice",
+  "level": "Standard",
+  "text": "A house was valued at $315,000. Two years later, it was valued at $294,000. What is the percent decrease in the value of the house?",
+  "orig": "315000",
+  "new": "294000",
+  "prefix": "$",
+  "unit": "",
+  "diff": "21000",
+  "ratio": "0.06667…",
+  "pct": "6.667…",
+  "answer": "6.7"
+ }
+];
+const MAX_TRIES = 2;
+const KEY = "percent-decrease-progress-v1";
+
+let progress = {};
+try { progress = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) { progress = {}; }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(progress)); } catch(e) {} }
+function rec(id){ return progress[id] || (progress[id] = {status:"new", tries:0, attempts:0, last:null}); }
+
+const $ = s => document.querySelector(s);
+const fmt = (v, p) => {
+  const n = Number(v);
+  const s = Number.isInteger(n) ? n.toLocaleString("en-US") : (p === "$" ? n.toFixed(2) : String(n));
+  return p === "$" ? "$" + s : s;
+};
+const withUnit = (v, p, u) => fmt(v, p) + (u ? " " + u : "");
+
+let list = PROBLEMS.slice();
+let idx = 0;
+
+function applyFilter(keepId){
+  const f = $("#filter").value;
+  list = PROBLEMS.filter(p => {
+    const s = rec(p.id).status;
+    if (f === "all") return true;
+    if (f === "review") return s === "missed" || s === "correct2";
+    if (f === "todo") return s === "new";
+    return p.set === f;
+  });
+  const k = list.findIndex(p => p.id === keepId);
+  idx = k >= 0 ? k : 0;
+  render();
+}
+
+function renderGrid(){
+  const cur = list[idx];
+  $("#grid").innerHTML = list.map((p, i) => {
+    const s = rec(p.id).status;
+    return `<button class="s-${s} ${cur && cur.id === p.id ? "current" : ""}" data-i="${i}" aria-label="Problem ${p.id}, ${label(s)}">${p.id}</button>`;
+  }).join("");
+}
+
+function label(s){ return {new:"Not answered", correct1:"Correct on 1st try", correct2:"Correct on 2nd try", missed:"Missed"}[s]; }
+
+function barsHTML(p, showLabels){
+  const w = (Number(p.new) / Number(p.orig)) * 100;
+  const newVal = fmt(p.new, p.prefix);
+  const tight = w < 30;
+  return `<div class="drop" aria-hidden="true">
+    <div class="bar-row"><span>Before</span><div class="track"><div class="bar grow" style="width:100%">${fmt(p.orig, p.prefix)}</div></div></div>
+    <div class="bar-row"><span>After</span><div class="track"><div class="bar grow" style="width:${w}%">${tight ? "" : newVal}</div>${tight ? `<span class="bar-out" style="left:${w}%">${newVal}</span>` : ""}<div class="gap" style="left:${w}%;width:${100 - w}%"></div></div></div>
+    ${showLabels ? `<div class="bar-row"><span></span><span>The dashed part is the decrease: ${withUnit(p.diff, p.prefix, p.unit)}</span></div>` : ""}
+  </div>`;
+}
+
+function solutionHTML(p){
+  return `<div class="solution">
+    <h3>Solution</h3>
+    <ol>
+      <li>Original value (before the change): <strong>${withUnit(p.orig, p.prefix, p.unit)}</strong>. New value (after): <strong>${withUnit(p.new, p.prefix, p.unit)}</strong>.</li>
+      <li>Find the amount of decrease: ${fmt(p.orig, p.prefix)} − ${fmt(p.new, p.prefix)} = <strong>${withUnit(p.diff, p.prefix, p.unit)}</strong>.</li>
+      <li>Divide by the <mark>original</mark> value: ${fmt(p.diff, p.prefix)} ÷ ${fmt(p.orig, p.prefix)} = ${p.ratio}</li>
+      <li>Multiply by 100: ${p.pct}%</li>
+      <li>Round to the nearest tenth: <strong>${p.answer}%</strong></li>
+    </ol>
+  </div>`;
+}
+
+function render(){
+  renderGrid();
+  const p = list[idx];
+  const card = $("#card");
+  if (!p){
+    card.innerHTML = `<p class="q">No problems match this filter. Choose “All 37 problems” to keep practicing.</p>`;
+    $("#prev").disabled = $("#next").disabled = true;
+    return;
+  }
+  const r = rec(p.id);
+  const done = r.status !== "new";
+  card.innerHTML = `
+    <div class="meta"><span>Problem ${p.id} of 37</span><span>${p.level}${p.set === "Original" ? ", homework" : ""}</span></div>
+    <p class="q">${p.text}</p>
+    ${barsHTML(p, done)}
+    <div class="answer">
+      <label for="ans" class="hidden">Your answer in percent</label>
+      <input id="ans" inputmode="decimal" autocomplete="off" placeholder="e.g. 12.5" ${done ? "disabled" : ""}> <span>%</span>
+      ${done ? `<button id="retry">Try this problem again</button>` : `<button id="check" class="primary">Check answer</button>`}
+      ${done ? "" : `<span class="tries">${MAX_TRIES - r.tries} ${MAX_TRIES - r.tries === 1 ? "try" : "tries"} left</span>`}
+    </div>
+    <div id="fb">${done ? resultMsg(r, p) : ""}</div>
+    ${done ? solutionHTML(p) : ""}`;
+  $("#prev").disabled = idx === 0;
+  $("#next").disabled = idx === list.length - 1;
+  if (!done){
+    $("#check").onclick = () => check(p);
+    $("#ans").onkeydown = e => { if (e.key === "Enter") check(p); };
+  } else {
+    $("#retry").onclick = () => { r.status = "new"; r.tries = 0; save(); render(); };
+  }
+}
+
+function resultMsg(r, p){
+  if (r.status === "missed") return `<div class="feedback bad">The correct answer is ${p.answer}%. Read the solution, then try it again later.</div>`;
+  return `<div class="feedback ok">Correct: ${p.answer}%${r.status === "correct2" ? " (on the 2nd try)" : ""}.</div>`;
+}
+
+function hintFor(v, p){
+  const o = Number(p.orig), n = Number(p.new), d = o - n;
+  const exact = d / o * 100;
+  const byNew = Math.round(d / n * 1000) / 10;
+  if (Math.abs(v - byNew) < 1e-9) return "It looks like you divided by the new value. Divide the decrease by the original value instead.";
+  if (Math.abs(v * 100 - exact) < 0.1) return "That is a decimal, not a percent. Multiply by 100 before you round.";
+  if (Math.abs(v - exact) < 0.1) return "You are very close. Check how you rounded to the nearest tenth.";
+  if (Math.abs(v - (100 - exact)) < 0.1) return "That is the percent that is left, not the percent that was lost. Use (original − new) on top.";
+  return "Not quite. Find the amount of decrease first, then divide it by the original value.";
+}
+
+function check(p){
+  const raw = $("#ans").value.replace(/[%,\s]/g, "");
+  const fb = $("#fb");
+  if (raw === "" || isNaN(Number(raw))){
+    fb.innerHTML = `<div class="feedback info">Type a number, such as 12.5.</div>`;
+    return;
+  }
+  const v = Number(raw), r = rec(p.id);
+  r.tries++; r.attempts++; r.last = new Date().toISOString();
+  if (Math.abs(v - Number(p.answer)) < 1e-9){
+    r.status = r.tries === 1 ? "correct1" : "correct2";
+  } else if (r.tries >= MAX_TRIES){
+    r.status = "missed";
+  } else {
+    save();
+    render();
+    $("#fb").innerHTML = `<div class="feedback bad">${hintFor(v, p)}</div>`;
+    $("#ans").value = raw; $("#ans").focus();
+    return;
+  }
+  save(); render();
+}
+
+function renderProgress(){
+  const all = PROBLEMS.map(p => ({p, r: rec(p.id)}));
+  const answered = all.filter(x => x.r.status !== "new").length;
+  const first = all.filter(x => x.r.status === "correct1").length;
+  const second = all.filter(x => x.r.status === "correct2").length;
+  const missed = all.filter(x => x.r.status === "missed").length;
+  const acc = answered ? Math.round((first + second) / answered * 100) : 0;
+  const pctDone = Math.round(answered / PROBLEMS.length * 100);
+  $("#stats").innerHTML = `
+    <div class="stat"><strong>${answered} / ${PROBLEMS.length}</strong><span>Problems answered</span><div class="meter"><div style="width:${pctDone}%"></div></div></div>
+    <div class="stat"><strong>${acc}%</strong><span>Answered correctly</span></div>
+    <div class="stat"><strong>${first}</strong><span>Correct on 1st try</span></div>
+    <div class="stat"><strong>${missed}</strong><span>Missed, worth reviewing</span></div>`;
+  $("#levels").innerHTML = ["Basic","Standard","Challenge"].map(lv => {
+    const g = all.filter(x => x.p.level === lv);
+    const ok = g.filter(x => x.r.status === "correct1" || x.r.status === "correct2").length;
+    return `<div class="stat"><strong>${ok} / ${g.length}</strong><span>${lv} correct</span><div class="meter"><div style="width:${ok / g.length * 100}%"></div></div></div>`;
+  }).join("");
+  const color = {new:"var(--line)", correct1:"var(--mint)", correct2:"var(--gold)", missed:"var(--rose)"};
+  $("#rows").innerHTML = all.map(({p, r}) => `<tr>
+    <td><a href="#" data-id="${p.id}">${p.id}</a></td><td>${p.level}</td>
+    <td><span class="pill" style="background:${color[r.status]};${r.status === "new" ? "color:var(--ink)" : ""}">${label(r.status)}</span></td>
+    <td>${r.attempts}</td><td>${r.last ? new Date(r.last).toLocaleString() : "–"}</td></tr>`).join("");
+  $("#headline").textContent = answered === PROBLEMS.length
+    ? `All ${PROBLEMS.length} problems answered. ${acc}% correct.`
+    : `${answered} of ${PROBLEMS.length} answered so far. Round every answer to the nearest tenth of a percent.`;
+}
+
+function show(tab){
+  const prac = tab === "practice";
+  $("#viewPractice").classList.toggle("hidden", !prac);
+  $("#viewProgress").classList.toggle("hidden", prac);
+  $("#tabPractice").setAttribute("aria-pressed", prac);
+  $("#tabProgress").setAttribute("aria-pressed", !prac);
+  if (prac) applyFilter(list[idx] && list[idx].id); else renderProgress();
+}
+
+$("#tabPractice").onclick = () => show("practice");
+$("#tabProgress").onclick = () => show("progress");
+$("#filter").onchange = () => applyFilter(list[idx] && list[idx].id);
+$("#grid").onclick = e => { const b = e.target.closest("button"); if (b){ idx = Number(b.dataset.i); render(); } };
+$("#prev").onclick = () => { if (idx > 0){ idx--; render(); } };
+$("#next").onclick = () => { if (idx < list.length - 1){ idx++; render(); } };
+$("#rows").onclick = e => {
+  const a = e.target.closest("a"); if (!a) return; e.preventDefault();
+  $("#filter").value = "all"; list = PROBLEMS.slice();
+  idx = list.findIndex(p => p.id === Number(a.dataset.id)); show("practice");
+};
+$("#reset").onclick = () => {
+  if (confirm("Reset all progress? This cannot be undone.")){ progress = {}; save(); renderProgress(); }
+};
+
+renderProgress();
+const firstTodo = PROBLEMS.findIndex(p => rec(p.id).status === "new");
+idx = firstTodo >= 0 ? firstTodo : 0;
+render();
+</script>
+</body>
+</html>
