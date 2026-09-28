@@ -24,8 +24,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);f
 .wrap{max-width:760px;margin:0 auto;padding:20px 18px 64px}
 header h1{font-size:1.6rem;line-height:1.2;margin:8px 0 4px;font-weight:700;letter-spacing:-.01em}
 header p{margin:0;color:var(--ink-soft);font-size:.95rem}
-.formula{margin:16px 0 0;padding:12px 14px;border-left:4px solid var(--ink);background:var(--sky);border-radius:0 8px 8px 0;font-size:.95rem}
-.formula b{background:var(--mark);padding:0 3px;border-radius:3px}
 nav.tabs{display:flex;gap:6px;margin:22px 0 14px}
 nav.tabs button{flex:1}
 button{font:inherit;cursor:pointer;border-radius:10px;border:2px solid var(--ink);background:transparent;color:var(--ink);padding:10px 14px;font-weight:600}
@@ -46,13 +44,6 @@ select{font:inherit;padding:8px 10px;border-radius:10px;border:2px solid var(--l
 .card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:20px}
 .meta{display:flex;justify-content:space-between;font-size:.85rem;color:var(--ink-soft);margin-bottom:10px}
 .q{font-size:1.08rem;margin:0 0 18px}
-.drop{margin:0 0 20px}
-.bar-row{display:grid;grid-template-columns:58px 1fr;align-items:center;gap:10px;margin:6px 0;font-size:.82rem;color:var(--ink-soft)}
-.track{position:relative;height:26px}
-.bar{height:100%;border-radius:6px;background:var(--ink);transform-origin:left;display:flex;align-items:center;padding-left:8px;color:var(--paper);font-size:.8rem;white-space:nowrap;overflow:hidden}
-.gap{position:absolute;top:0;height:100%;border:2px dashed var(--rose);border-left:none;border-radius:0 6px 6px 0;background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--rose) 22%,transparent) 6px 9px)}
-.bar-out{position:absolute;top:0;height:100%;display:flex;align-items:center;padding-left:8px;font-size:.8rem;color:var(--ink);white-space:nowrap;z-index:1}
-@media (prefers-reduced-motion:no-preference){.bar.grow{animation:grow .6s ease-out}@keyframes grow{from{transform:scaleX(0)}}}
 .answer{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .answer input{font:inherit;font-size:1.15rem;width:150px;padding:9px 12px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--ink)}
 .tries{font-size:.85rem;color:var(--ink-soft)}
@@ -60,11 +51,6 @@ select{font:inherit;padding:8px 10px;border-radius:10px;border:2px solid var(--l
 .feedback.ok{background:color-mix(in srgb,var(--mint) 15%,transparent);border-left:4px solid var(--mint)}
 .feedback.bad{background:color-mix(in srgb,var(--rose) 13%,transparent);border-left:4px solid var(--rose)}
 .feedback.info{background:var(--sky);border-left:4px solid var(--ink)}
-.solution{margin-top:16px;border-top:2px solid var(--line);padding-top:14px}
-.solution h3{margin:0 0 8px;font-size:1rem}
-.solution ol{margin:0;padding-left:1.3em}
-.solution li{margin:5px 0}
-.solution mark{background:var(--mark);color:inherit;padding:0 3px;border-radius:3px}
 .nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
 .stat{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:12px 14px}
@@ -88,7 +74,6 @@ h2{font-size:1.15rem;margin:22px 0 10px}
 <header>
   <h1>Percent Decrease Practice</h1>
   <p id="headline">37 problems. Round every answer to the nearest tenth of a percent.</p>
-  <div class="formula">Percent decrease = (original − new) ÷ <b>original</b> × 100</div>
 </header>
 
 <nav class="tabs">
@@ -665,12 +650,6 @@ function save(){ try { localStorage.setItem(KEY, JSON.stringify(progress)); } ca
 function rec(id){ return progress[id] || (progress[id] = {status:"new", tries:0, attempts:0, last:null}); }
 
 const $ = s => document.querySelector(s);
-const fmt = (v, p) => {
-  const n = Number(v);
-  const s = Number.isInteger(n) ? n.toLocaleString("en-US") : (p === "$" ? n.toFixed(2) : String(n));
-  return p === "$" ? "$" + s : s;
-};
-const withUnit = (v, p, u) => fmt(v, p) + (u ? " " + u : "");
 
 let list = PROBLEMS.slice();
 let idx = 0;
@@ -699,30 +678,6 @@ function renderGrid(){
 
 function label(s){ return {new:"Not answered", correct1:"Correct on 1st try", correct2:"Correct on 2nd try", missed:"Missed"}[s]; }
 
-function barsHTML(p, showLabels){
-  const w = (Number(p.new) / Number(p.orig)) * 100;
-  const newVal = fmt(p.new, p.prefix);
-  const tight = w < 30;
-  return `<div class="drop" aria-hidden="true">
-    <div class="bar-row"><span>Before</span><div class="track"><div class="bar grow" style="width:100%">${fmt(p.orig, p.prefix)}</div></div></div>
-    <div class="bar-row"><span>After</span><div class="track"><div class="bar grow" style="width:${w}%">${tight ? "" : newVal}</div>${tight ? `<span class="bar-out" style="left:${w}%">${newVal}</span>` : ""}<div class="gap" style="left:${w}%;width:${100 - w}%"></div></div></div>
-    ${showLabels ? `<div class="bar-row"><span></span><span>The dashed part is the decrease: ${withUnit(p.diff, p.prefix, p.unit)}</span></div>` : ""}
-  </div>`;
-}
-
-function solutionHTML(p){
-  return `<div class="solution">
-    <h3>Solution</h3>
-    <ol>
-      <li>Original value (before the change): <strong>${withUnit(p.orig, p.prefix, p.unit)}</strong>. New value (after): <strong>${withUnit(p.new, p.prefix, p.unit)}</strong>.</li>
-      <li>Find the amount of decrease: ${fmt(p.orig, p.prefix)} − ${fmt(p.new, p.prefix)} = <strong>${withUnit(p.diff, p.prefix, p.unit)}</strong>.</li>
-      <li>Divide by the <mark>original</mark> value: ${fmt(p.diff, p.prefix)} ÷ ${fmt(p.orig, p.prefix)} = ${p.ratio}</li>
-      <li>Multiply by 100: ${p.pct}%</li>
-      <li>Round to the nearest tenth: <strong>${p.answer}%</strong></li>
-    </ol>
-  </div>`;
-}
-
 function render(){
   renderGrid();
   const p = list[idx];
@@ -737,15 +692,13 @@ function render(){
   card.innerHTML = `
     <div class="meta"><span>Problem ${p.id} of 37</span><span>${p.level}${p.set === "Original" ? ", homework" : ""}</span></div>
     <p class="q">${p.text}</p>
-    ${barsHTML(p, done)}
     <div class="answer">
       <label for="ans" class="hidden">Your answer in percent</label>
       <input id="ans" inputmode="decimal" autocomplete="off" placeholder="e.g. 12.5" ${done ? "disabled" : ""}> <span>%</span>
       ${done ? `<button id="retry">Try this problem again</button>` : `<button id="check" class="primary">Check answer</button>`}
       ${done ? "" : `<span class="tries">${MAX_TRIES - r.tries} ${MAX_TRIES - r.tries === 1 ? "try" : "tries"} left</span>`}
     </div>
-    <div id="fb">${done ? resultMsg(r, p) : ""}</div>
-    ${done ? solutionHTML(p) : ""}`;
+    <div id="fb">${done ? resultMsg(r, p) : ""}</div>`;
   $("#prev").disabled = idx === 0;
   $("#next").disabled = idx === list.length - 1;
   if (!done){
@@ -758,19 +711,8 @@ function render(){
 }
 
 function resultMsg(r, p){
-  if (r.status === "missed") return `<div class="feedback bad">The correct answer is ${p.answer}%. Read the solution, then try it again later.</div>`;
+  if (r.status === "missed") return `<div class="feedback bad">The correct answer is ${p.answer}%.</div>`;
   return `<div class="feedback ok">Correct: ${p.answer}%${r.status === "correct2" ? " (on the 2nd try)" : ""}.</div>`;
-}
-
-function hintFor(v, p){
-  const o = Number(p.orig), n = Number(p.new), d = o - n;
-  const exact = d / o * 100;
-  const byNew = Math.round(d / n * 1000) / 10;
-  if (Math.abs(v - byNew) < 1e-9) return "It looks like you divided by the new value. Divide the decrease by the original value instead.";
-  if (Math.abs(v * 100 - exact) < 0.1) return "That is a decimal, not a percent. Multiply by 100 before you round.";
-  if (Math.abs(v - exact) < 0.1) return "You are very close. Check how you rounded to the nearest tenth.";
-  if (Math.abs(v - (100 - exact)) < 0.1) return "That is the percent that is left, not the percent that was lost. Use (original − new) on top.";
-  return "Not quite. Find the amount of decrease first, then divide it by the original value.";
 }
 
 function check(p){
@@ -789,7 +731,7 @@ function check(p){
   } else {
     save();
     render();
-    $("#fb").innerHTML = `<div class="feedback bad">${hintFor(v, p)}</div>`;
+    $("#fb").innerHTML = `<div class="feedback bad">Not quite. Work it out again and enter your second answer.</div>`;
     $("#ans").value = raw; $("#ans").focus();
     return;
   }
