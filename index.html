@@ -31,15 +31,15 @@ button.primary{background:var(--ink);color:var(--paper)}
 button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 button:disabled{opacity:.4;cursor:default}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:5px;margin:4px 0 6px}
-.grid button{padding:0;height:34px;border-radius:7px;font-size:.8rem;border:2px solid var(--line);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px;margin:0 0 12px}
+.grid button{padding:0;height:40px;border-radius:8px;font-size:.85rem;border:2px solid var(--line);font-weight:600}
 .grid button.s-correct1{background:var(--mint);border-color:var(--mint);color:#fff}
 .grid button.s-correct2{background:var(--gold);border-color:var(--gold);color:#fff}
 .grid button.s-missed{background:var(--rose);border-color:var(--rose);color:#fff}
 .grid button.current{outline:3px solid var(--ink);outline-offset:1px}
-.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--ink-soft);margin-bottom:14px}
+.legend{display:flex;flex-wrap:wrap;gap:10px 14px;font-size:.8rem;color:var(--ink-soft)}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:2px solid var(--line)}
-.filters{display:flex;gap:8px;align-items:center;margin-bottom:14px;font-size:.9rem}
+.filters{display:flex;gap:8px;align-items:center;margin-bottom:12px;font-size:.9rem}
 select{font:inherit;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
 .card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:20px}
 .meta{display:flex;justify-content:space-between;font-size:.85rem;color:var(--ink-soft);margin-bottom:10px}
@@ -52,6 +52,16 @@ select{font:inherit;padding:8px 10px;border-radius:10px;border:2px solid var(--l
 .feedback.bad{background:color-mix(in srgb,var(--rose) 13%,transparent);border-left:4px solid var(--rose)}
 .feedback.info{background:var(--sky);border-left:4px solid var(--ink)}
 .nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.done{display:flex;align-items:center;gap:12px;margin:20px 0 10px;font-size:.85rem;color:var(--ink-soft)}
+.done .meter{flex:1;margin:0}
+.done span{white-space:nowrap}
+#picker{border:2px solid var(--line);border-radius:12px;background:var(--card)}
+#picker summary{cursor:pointer;padding:12px 14px;font-weight:600;font-size:.9rem;list-style:none;display:flex;justify-content:space-between;align-items:center}
+#picker summary::-webkit-details-marker{display:none}
+#picker summary::after{content:"+";font-size:1.1rem;color:var(--ink-soft)}
+#picker[open] summary::after{content:"–"}
+#picker summary:focus-visible{outline:3px solid var(--gold);outline-offset:-3px;border-radius:10px}
+.picker-body{padding:0 14px 14px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
 .stat{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:12px 14px}
 .stat strong{display:block;font-size:1.6rem;line-height:1.2}
@@ -73,7 +83,7 @@ h2{font-size:1.15rem;margin:22px 0 10px}
 <div class="wrap">
 <header>
   <h1>Percent Decrease Practice</h1>
-  <p id="headline">37 problems. Round every answer to the nearest tenth of a percent.</p>
+  <p>Round every answer to the nearest tenth of a percent.</p>
 </header>
 
 <nav class="tabs">
@@ -82,29 +92,39 @@ h2{font-size:1.15rem;margin:22px 0 10px}
 </nav>
 
 <section id="viewPractice">
-  <div class="filters">
-    <label for="filter">Show</label>
-    <select id="filter">
-      <option value="all">All 37 problems</option>
-      <option value="Original">Homework problems (1–7)</option>
-      <option value="Practice">Extra practice (8–37)</option>
-      <option value="review">Missed or needed 2 tries</option>
-      <option value="todo">Not answered yet</option>
-    </select>
-  </div>
-  <div class="grid" id="grid"></div>
-  <div class="legend">
-    <span><i></i>Not answered</span>
-    <span><i style="background:var(--mint);border-color:var(--mint)"></i>Correct on 1st try</span>
-    <span><i style="background:var(--gold);border-color:var(--gold)"></i>Correct on 2nd try</span>
-    <span><i style="background:var(--rose);border-color:var(--rose)"></i>Missed</span>
-  </div>
-
   <article class="card" id="card"></article>
   <div class="nav">
-    <button id="prev">Previous</button>
-    <button id="next" class="primary">Next problem</button>
+    <button id="prev">← Previous</button>
+    <button id="next" class="primary">Next →</button>
   </div>
+
+  <div class="done">
+    <div class="meter"><div id="doneBar"></div></div>
+    <span id="headline">0 of 37 answered</span>
+  </div>
+
+  <details id="picker">
+    <summary>Jump to another problem</summary>
+    <div class="picker-body">
+      <div class="filters">
+        <label for="filter">Show</label>
+        <select id="filter">
+          <option value="all">All 37 problems</option>
+          <option value="Original">Homework problems (1–7)</option>
+          <option value="Practice">Extra practice (8–37)</option>
+          <option value="review">Missed or needed 2 tries</option>
+          <option value="todo">Not answered yet</option>
+        </select>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="legend">
+        <span><i></i>Not answered</span>
+        <span><i style="background:var(--mint);border-color:var(--mint)"></i>Correct on 1st try</span>
+        <span><i style="background:var(--gold);border-color:var(--gold)"></i>Correct on 2nd try</span>
+        <span><i style="background:var(--rose);border-color:var(--rose)"></i>Missed</span>
+      </div>
+    </div>
+  </details>
 </section>
 
 <section id="viewProgress" class="hidden">
@@ -761,9 +781,8 @@ function renderProgress(){
     <td><a href="#" data-id="${p.id}">${p.id}</a></td><td>${p.level}</td>
     <td><span class="pill" style="background:${color[r.status]};${r.status === "new" ? "color:var(--ink)" : ""}">${label(r.status)}</span></td>
     <td>${r.attempts}</td><td>${r.last ? new Date(r.last).toLocaleString() : "–"}</td></tr>`).join("");
-  $("#headline").textContent = answered === PROBLEMS.length
-    ? `All ${PROBLEMS.length} problems answered. ${acc}% correct.`
-    : `${answered} of ${PROBLEMS.length} answered so far. Round every answer to the nearest tenth of a percent.`;
+  $("#headline").textContent = `${answered} of ${PROBLEMS.length} answered`;
+  $("#doneBar").style.width = pctDone + "%";
 }
 
 function show(tab){
@@ -778,12 +797,12 @@ function show(tab){
 $("#tabPractice").onclick = () => show("practice");
 $("#tabProgress").onclick = () => show("progress");
 $("#filter").onchange = () => applyFilter(list[idx] && list[idx].id);
-$("#grid").onclick = e => { const b = e.target.closest("button"); if (b){ idx = Number(b.dataset.i); render(); } };
+$("#grid").onclick = e => { const b = e.target.closest("button"); if (b){ idx = Number(b.dataset.i); $("#picker").open = false; render(); } };
 $("#prev").onclick = () => { if (idx > 0){ idx--; render(); } };
 $("#next").onclick = () => { if (idx < list.length - 1){ idx++; render(); } };
 $("#rows").onclick = e => {
   const a = e.target.closest("a"); if (!a) return; e.preventDefault();
-  $("#filter").value = "all"; list = PROBLEMS.slice();
+  $("#filter").value = "all"; list = PROBLEMS.slice(); $("#picker").open = false;
   idx = list.findIndex(p => p.id === Number(a.dataset.id)); show("practice");
 };
 $("#reset").onclick = () => {
